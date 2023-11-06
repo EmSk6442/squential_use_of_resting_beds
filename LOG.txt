@@ -1,3 +1,10 @@
 LOG
 
-hallå
+2023-11-01
+Introduktionsmöte med Lars och Stefan. Vi fick tillgång till projekthemsidan med användbara artiklar.
+
+2023-11-03
+Möte med Lars där vi fick en dags data och mer precis info ang projektet. Två nya möten inbokade, Hector på nästa fredag och hela forskargruppen på onsdag om två veckor.
+
+2023-11-06
+Vi har börjat med koden, med datan som vi fått har vi tagit bort kor som inte ska undersökas och vi har även börjat på att bygga en funktion för att sammanställa vilka kor som ligger i vilka sängar.
