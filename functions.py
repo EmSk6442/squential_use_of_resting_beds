@@ -153,7 +153,7 @@ def assign_cows_to_beds(df, barn_filename):
         for j in range(1, len(x)-1): #For each position, assign it to a bed
             if is_inside((x[j], y[j]), area) and not is_inside((x[j-1], y[j-1]), area): #start time when entering booth
                 start_time = time[j]
-            elif is_inside((x[j], y[j]), area) and not is_inside((x[j+1], y[j+1]), area):      #stayes in booth
+            elif is_inside((x[j], y[j]), area) and not is_inside((x[j+1], y[j+1]), area)): #and not is_inside((x[j+5], y[j+5]), area):      stayes in booth
                 stop_time = time[j]
                 beds[0].append([u_cows[i], start_time, stop_time, (stop_time - start_time)/1000])
     return beds      #Return a list of lists of the ID:s of cows in different beds
