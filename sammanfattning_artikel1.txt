@@ -1,0 +1,18 @@
+"Parity and days in milk affect cubicle occupancy in dairy cows"
+
+Kor som har haft fler kalvar, är äldre, andvänder sängarna nära mjölkningsområdet och matningsområdet. 
+Kor som fått färre kalvar använder sängar längre ifrån mjölknings- och matområdet.
+Dock används sängarna vid maten mest!
+
+Kor ligger ner ca 11h om dagen, 6-16h. Sover 4h. Kor i tidig laktationsstadie spenderar mera tid på att äta,
+alltså i matområdet, och mindre tid i sängarna och att ligga ner än kor i senare stadier.
+Tidigare studier visar att preferenser för sängar kan finnas pga sociala ranken och hur dominant kon är.
+Kor har en stor motivation till att ligga ner och arbetar lite extra för att komma åt sängområdet och blir 
+även mer stressade om deras möjlighet till att ligga ner begränsas.
+
+Använde Real Time Location System (RTLS) för att få fram positionsdata. Man kollade på hur statestiken såg ut
+för vilka sängar som användes och hur mycket. Datan kunde dock visa att två kor var i samma säng under en period
+vilket ökade användningen av en säng drastiskt även fast det inte var så i verkligheten. Man kunde också enbart
+se positionen av korna och inte aktiviteten, man vet alltså inte exakt om korna ligger ner eller står i sängområdet.
+Kor som fått många kalvar har färre och längre perioder med låg aktivitet (stående eller liggande) och spenderar
+inte lika mycket tid på att äta.
