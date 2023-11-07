@@ -15,3 +15,7 @@ vi har även börjat på att bygga en funktion för att sammanställa vilka kor 
 Läst de två artiklarna som är mest relaterade till vårt arbete, "New insight into social relationships
 in dairy cows, and how time of birth, parity and relatedness affect spatial interactions later in life"
 och "Parity and days in milk affect cubicle occupancy in dairy cows", och sammanfattade de kort.
+
+Vi fortsatte även med koden, delade upp korna i höger och vänster halva och tog bort kor som hade färre
+datapunkter än 70% av antalet datapunkter från kon med flest datapunkter. Fortsatt kollat på hur vi ska
+sammanställa vilka kor som ligger i vilka sängar för att undvika för krävande beräkningar.
