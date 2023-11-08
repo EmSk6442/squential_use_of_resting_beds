@@ -7,7 +7,8 @@ import matplotlib.lines as mlines
 import matplotlib.patches as pat
 from matplotlib.animation import FuncAnimation
 from matplotlib import transforms
-from datetime import datetime
+import datetime as datetime
+import time
 
 # read csv-file
 def csv_read_FA(filename, nrows):
@@ -39,12 +40,11 @@ def remove_cows_missing_data_points(df):
     df = drop_tags_list(df, tags)
     return df
 
-# drop cows under y-line and divide into left and right
-def cows_above_yline(df, barn_filename):
+# drop cows under y-line and divide into g1 and g2
+def cows_above_yline_right_left(df, barn_filename):
     barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
-    tags = []
-    right = []
-    left = []
+    g1 = []
+    g2 = []
     left_wall = list(barn['x1'])[0]
     right_wall = list(barn['x3'])[0]
     y_line = 2595
@@ -52,15 +52,14 @@ def cows_above_yline(df, barn_filename):
     for i in range(len(u_cows)):
         temp = df.loc[df['tag_id'] == u_cows[i]]
         x,y,z = positions(temp)
-        if y[0] < y_line:
-            tags.append(u_cows[i])
-        elif sum(x)/len(x) <= left_wall + (right_wall+left_wall)/2:
-            left.append(u_cows[i])
-        else:
-            right.append(u_cows[i])
-    left_df = df[df['tag_id'].isin(left)]
-    right_df = df[df['tag_id'].isin(right)]
-    return left_df, right_df
+        if y[0] > y_line:
+            if sum(x)/len(x) <= left_wall + (right_wall+left_wall)/2:
+                g2.append(u_cows[i])
+            else:
+                g1.append(u_cows[i])
+    g2_df = df[df['tag_id'].isin(g2)]
+    g1_df = df[df['tag_id'].isin(g1)]
+    return g2_df, g1_df
 
 # function to drop rows with certain tag_ids from list
 def drop_tags_list(df, tags):
@@ -77,6 +76,14 @@ def drop_tags(df, tags_filename):
         df = df.drop(df[df.tag_id == tag_ids[i]].index)
     return df
 
+def cows_between_time(df, t0, t1):
+    t0 = int(time.mktime(t0.timetuple()))*1000
+    t1 = int(time.mktime(t1.timetuple()))*1000
+    index_t0 = df.iloc[(df['time']-t0).abs().argsort()[:1]].index
+    index_t1 = df.iloc[(df['time']-t1).abs().argsort()[:1]].index
+    df = df[df.index.isin(range(index_t0[0], index_t1[0]))]
+    return df
+
 # find coordinates
 def positions(df):
     x = list(df['x'])
@@ -85,16 +92,15 @@ def positions(df):
     return x,y,z
 
 # function to assign a cow to bed based on how long the cow is in the bed
-def assign_cows_to_beds(df, side, barn_filename):
+def assign_cows_to_beds(df, barn_filename):
     u_cows = unique_cows(df)   #Get a list of the unique cows ID:s
 
     barn = pd.read_csv(barn_filename, skiprows=0, sep=';', header=0)            #Read the barn beds coordinates
-    barn.columns = ['Unit', 'x1', 'x2', 'x3', 'x4', 'y1', 'y2', 'y3', 'y4']
+    #barn.columns = ['Unit', 'x1', 'x2', 'x3', 'x4', 'y1', 'y2', 'y3', 'y4']
 
     bedarea = []
-    for i in range(5, len(barn)):
+    for i in range(13, len(barn)):
         bedarea.append(barn.iloc[i])
-
     beds = {}
     for i in range(len(bedarea)):
         beds[i] = []
@@ -107,18 +113,22 @@ def assign_cows_to_beds(df, side, barn_filename):
         stop_time = time[-1]
         for j in range(1, len(x)-1): #For each position, assign it to a bed
             for k in range(len(bedarea)):
-                if is_inside((x[j], y[j]), bedarea[k]) and not is_inside((x[j-1], y[j-1]), bedarea[k]):   #start time when entering booth
-                    start_time = time[j]
-                elif is_inside((x[j], y[j]), bedarea[k]) and not is_inside((x[j+1], y[j+1]), bedarea[k]): #stayes in booth
-                    stop_time = time[j]
-                    if (stop_time - start_time)/1000 > 180:
-                        beds[k].append([u_cows[i], start_time, stop_time, (stop_time - start_time)/1000])
+                if is_inside((x[j], y[j]), bedarea[k]) == True:
+                    if not is_inside((x[j-1], y[j-1]), bedarea[k]):   #start time when entering booth
+                        start_time = time[j]
+                    elif is_inside((x[j], y[j]), bedarea[k]) and not is_inside((x[j+1], y[j+1]), bedarea[k]): #stayes in booth
+                        stop_time = time[j]
+                        if (stop_time - start_time)/1000 > 60:
+                            beds[k].append([u_cows[i], start_time, stop_time, round((stop_time - start_time)/1000)])
+                            continue
     return beds      #Return a list of lists of the ID:s of cows in different beds
 
 
 # function to sort the cows in bed based on startingtime
 def sort_beds_by_start_time(beds):
-    print(beds[0])
+    for i in range(len(beds)):
+        beds[i] = sorted(beds[i], key=lambda value:value[1])
+    return beds
     
 
 # cow iside bed
@@ -130,7 +140,7 @@ def is_inside(pos, bed):
 
 
 
-###############################################################################
+###############################################################################value[]
 ####                               PLOTS                                  #####
 ###############################################################################
 

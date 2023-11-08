@@ -3,33 +3,42 @@ import initialization as init
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import datetime
 
 # read file
-nrows = 100000
+nrows = 6000000
 file = "FA_20200922T000000UTC.csv"
 barn_file = "barn.csv"
 df = func.csv_read_FA(file, nrows)
-
+print(len(df))
+# removes cows with more than 70% datapoints missing 
 df = func.remove_cows_missing_data_points(df)
-u_cows = func.unique_cows(df)
-print(len(u_cows))
+print(len(df))
+# sort out cows above y-line and per G1 or G2
+g2_df, g1_df = func.cows_above_yline_right_left(df, barn_file)
+print(len(g1_df))
+# divide df into milking 1 and milking 2
+g1_t0 = datetime.datetime(2020, 9, 22, 5, 0)
+g1_t1 = datetime.datetime(2020, 9, 22, 9, 0)
+#g1_t2 = datetime.datetime(2020, 9, 22, 16, 30)
+#g1_t3 = datetime.datetime(2020, 9, 22, 20, 30)
+g1_df_milk1 = func.cows_between_time(g1_df, g1_t0, g1_t1)
+#g1_df_milk2 = func.cows_between_time(g1_df, g1_t2, g1_t2)
+print(len(g1_df_milk1))
 
-# sort out cows
-left_df, right_df = func.cows_above_yline(df, barn_file)
-u_cows_left = func.unique_cows(left_df)
-u_cows_right = func.unique_cows(right_df)
-print(len(u_cows_left), len(u_cows_right))
+#g2_t0 = datetime.datetime(2020, 9, 22, 7, 0)
+#g2_t1 = datetime.datetime(2020, 9, 22, 11, 2)
+#g2_t2 = datetime.datetime(2020, 9, 22, 18, 30)
+#g2_t3 = datetime.datetime(2020, 9, 22, 24, 0)
+#g2_df_milk1 = func.cows_between_time(g2_df, g2_t0, g2_t1)
+#g2_df_milk2 = func.cows_between_time(g2_df, g2_t2, g2_t3)
 
-beds = func.assign_cows_to_beds(df, 'left', barn_file)
+# assign cows to a bed in the
+beds = func.assign_cows_to_beds(g1_df_milk1, barn_file)
 
+# sort the cows in bed in order of starting time
 beds = func.sort_beds_by_start_time(beds)
 
-## after milking for each bed check which cows lay in th bed in order
 
-# identify beds
-
-# init time when milking
-
-# cows in bed, store cow tag id and time t_0 and t_1 in bed
 
 # visualize
