@@ -22,4 +22,5 @@ sammanställa vilka kor som ligger i vilka sängar för att undvika för krävan
 
 2023-11-08
 Fixade induviduella sängbås och avgränsade datan till tider som vi vill kolla mellan, vilket anpassas
-till tider för mjölkning.
+till tider för mjölkning. Förberett oss inför mötet på fredag. Vissa delar av koden tar tid så vi ska
+försöka hitta inbyggda funktioner som kan användas till att göra koden snabbare.
