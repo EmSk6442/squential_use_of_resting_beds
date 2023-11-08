@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # read file
-nrows = 1000000
+nrows = 100000
 file = "FA_20200922T000000UTC.csv"
 barn_file = "barn.csv"
 df = func.csv_read_FA(file, nrows)
@@ -20,8 +20,9 @@ u_cows_left = func.unique_cows(left_df)
 u_cows_right = func.unique_cows(right_df)
 print(len(u_cows_left), len(u_cows_right))
 
-lst = func.assign_cows_to_beds(df, 'left', barn_file)
-print(lst)
+beds = func.assign_cows_to_beds(df, 'left', barn_file)
+
+beds = func.sort_beds_by_start_time(beds)
 
 ## after milking for each bed check which cows lay in th bed in order
 
