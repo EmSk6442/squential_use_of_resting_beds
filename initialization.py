@@ -106,7 +106,7 @@ def custom_area(df_cow,x1,x2,y1,y2):
 
 # Function to delimite the barn and the different areas
 def area_delimitation(df_cow,area):
-    barn = pd.read_csv("../data/barn.csv", skiprows = 0, sep = ';', header=0)
+    barn = pd.read_csv("barn.csv", skiprows = 0, sep = ';', header=0)
     barn.columns = ['Unit', 'x1', 'x2', 'x3', 'x4', 'y1', 'y2', 'y3','y4']
 
     b1_x1 = int(barn[barn['Unit']=='Base']['x1'])
@@ -132,43 +132,36 @@ def area_delimitation(df_cow,area):
     
     return df_cow
 
-# Function create a subset from a dataframe matching the given tag id,starting and ending epoch time and area  
-def create_cow(cow_id,df,e_min,e_max,area):
-    df_cow = df[(df['tag_id']==cow_id) & (df['epoch_time']>=e_min*1000) & (df['epoch_time']<e_max*1000)]
-    df_cow = area_delimitation(df_cow,area)
-    df_cow.reset_index(drop=True, inplace=True)
-    df_cow['rounded_time'] = (df_cow['epoch_time']/1000).astype(int) # rounded time to remove the milliseconds 
-    return df_cow
-
 # Function to add the missing coordinates to the dataframe by data interpolation
 def create_coordinates(df_cow,i,time_gap,t,t2,x2,y2):
     time = 1000
     ls = []
     td = int(time_gap[i])
-    for j in range (1,td):
+    print(td)
+    for j in range (1, td):
         ind = np.where(t2 == t[i-1]+j)
         xf = int(x2[ind])
         yf = int(y2[ind])
-        ls.append(['FA_ADD', df_cow['tag_id'].loc[i], df_cow['tag_string'].loc[i], df_cow['epoch_time'].loc[i-1] + time, round(xf), round(yf), df_cow['z'].loc[i], int((df_cow['epoch_time'].loc[i-1] + time)/1000)])
+        ls.append(['FA', df_cow['tag_id'].loc[i], df_cow['tag_string'].loc[i], df_cow['time'].loc[i-1] + time, round(xf), round(yf), df_cow['z'].loc[i]])
         time += 1000
     return ls
 
 # Function compute the missing data
 def fill_data(df_cow,area):
     if df_cow.empty is False:    
-        df_cow.drop_duplicates(subset ='rounded_time', keep = 'first', inplace = True)
+        df_cow.drop_duplicates(subset = "time", keep = 'first', inplace = True)
         df_cow.reset_index(drop=True, inplace=True)
 
         # Create subset of all time gaps of more than 1 second
-        time_gap = df_cow['rounded_time'].diff()[df_cow['rounded_time'].diff()>1]
-        difference = df_cow[df_cow['rounded_time'].diff()>1]
+        time_gap = df_cow['time'].diff()[df_cow['time'].diff()>1]
+        difference = df_cow[df_cow['time'].diff()>1]
         index = difference.index
         list_coord = []
 
-        t = df_cow['rounded_time'].to_numpy()
+        t = df_cow['time'].to_numpy()
         t2 = np.arange(t[0], t[-1], 0.1)
         t2 = np.around(t2, decimals=1)
-
+        
         # Data interpolation
         x = df_cow['x'].to_numpy()
         x2 = Akima1DInterpolator(t, x)(t2)
@@ -181,9 +174,9 @@ def fill_data(df_cow,area):
 
         df_cow = df_cow.append(pd.DataFrame(list_coord, columns=df_cow.columns), ignore_index=True)
         # Make sure the coordinates are not out of range
-        df_cow = area_delimitation(df_cow,area)
-        df_cow.drop_duplicates(subset ='rounded_time', keep = 'first', inplace = True)
-        df_cow = df_cow.sort_values(by=['rounded_time'])
+        df_cow = area_delimitation(df_cow, area)
+        df_cow.drop_duplicates(subset ='time', keep = 'first', inplace = True)
+        df_cow = df_cow.sort_values(by=['time'])
         df_cow.reset_index(drop=True, inplace=True)
 
     return df_cow
