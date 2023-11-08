@@ -19,3 +19,7 @@ och "Parity and days in milk affect cubicle occupancy in dairy cows", och samman
 Vi fortsatte även med koden, delade upp korna i höger och vänster halva och tog bort kor som hade färre
 datapunkter än 70% av antalet datapunkter från kon med flest datapunkter. Fortsatt kollat på hur vi ska
 sammanställa vilka kor som ligger i vilka sängar för att undvika för krävande beräkningar.
+
+2023-11-08
+Fixade induviduella sängbås och avgränsade datan till tider som vi vill kolla mellan, vilket anpassas
+till tider för mjölkning.
