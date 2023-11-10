@@ -24,3 +24,10 @@ sammanställa vilka kor som ligger i vilka sängar för att undvika för krävan
 Fixade induviduella sängbås och avgränsade datan till tider som vi vill kolla mellan, vilket anpassas
 till tider för mjölkning. Förberett oss inför mötet på fredag. Vissa delar av koden tar tid så vi ska
 försöka hitta inbyggda funktioner som kan användas till att göra koden snabbare.
+
+2023-11-09
+Vi var på Utnarm hela dagen och kunde därav inte jobba på projektet.
+
+2023-11-10
+Möte med Hector om mer bakgrundinformation av projektet och spefificerade fler av vilkoren som behövs
+uppfyllas för att kunna undersöka datan. Specificerat vad vi ska fokusera på nästa vecka.
