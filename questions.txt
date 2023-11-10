@@ -1,4 +1,5 @@
 How long is shorlty after beeing milked?
+Vi kan undersöka olika (test with 1 hour)
 
 How do we know when a cow is lying down?
   Right now we check a minimum time in a cubicle and assume they are lying down when achived
