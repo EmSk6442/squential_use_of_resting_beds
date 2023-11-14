@@ -38,6 +38,7 @@ def cows_above_yline_right_left(df, barn_filename):
     y_line = 2595
 
     mean_cow = df.groupby('tag_id').mean()
+    print(mean_cow)
     df_keep = mean_cow[mean_cow['y'] >= y_line].index
     df = df[df["tag_id"].isin(df_keep)]
     
@@ -94,6 +95,17 @@ def assign_cows_to_beds(df, barn_filename):
                             continue
     return beds      #Return a list of lists of the ID:s of cows in different beds
 
+def assign_cows_to_bed(df, barn_filename):
+    df["bed_id"] = np.nan
+    barn = pd.read_csv(barn_filename, skiprows=0, sep=';', header=0)
+    bedarea = list()
+    for i in range(13, len(barn)):
+        bedarea.append(barn.iloc[i])
+    for i in range(len(bedarea)):  
+        test = df[(df['x']  >= bedarea[i][1]) & (df['x']  < bedarea[i][3]) & (df['y']  >= bedarea[i][5]) & (df['y']  < bedarea[i][6])].index
+        df.loc[test, "bed_id"] = i
+    return df
+    
 
 # function to sort the cows in bed based on startingtime
 def sort_beds_by_start_time(beds):
