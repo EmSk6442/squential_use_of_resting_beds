@@ -36,3 +36,7 @@ uppfyllas för att kunna undersöka datan. Specificerat vad vi ska fokusera på 
 Förberett presentation till på onsdag. Fixade animering av hur korna rör sig för att få en överblick.
 Vi har även kollat på pandas biblioteket för att kunna använda redan exsisterande funktioner som kan
 optimera vår kod. Optimerat funktionerna cows_above_yline_right_left, remove_cow_missing_datapoints.
+
+2023-11-14
+Fortsatt optimera kod! skrev en funktion för att spara data i en cvs-fil och en som sorterar kossorna i
+sängar och försöker spara de två längsta tiderna för varje ko i rätt säng.
