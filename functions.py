@@ -19,6 +19,15 @@ def csv_read_FA(filename, nrows):
     df.columns = ['data_entity', 'tag_id', 'tag_string', 'time', 'x', 'y', 'z']
     return df
 
+# dataframe for beds
+def bed_data_frame(barn_filename):
+    barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
+    df = pd.DataFrame(index = range(0, len(barn)-13), columns=['1_tag_id', '1_start_time', '1_durration', '2_tag_id', '2_start_time', '2_durration'])
+    return df
+
+def save_csv(df):
+    df.to_csv('test.csv')
+
 # number of cows
 def unique_cows(df):
     return df.tag_id.unique()
@@ -37,11 +46,12 @@ def cows_above_yline_right_left(df, barn_filename):
     right_wall = list(barn['x3'])[0]
     y_line = 2595
 
+    #Mean above y-line
     mean_cow = df.groupby('tag_id').mean()
-    print(mean_cow)
     df_keep = mean_cow[mean_cow['y'] >= y_line].index
     df = df[df["tag_id"].isin(df_keep)]
     
+    #Mean in either g1 or g2 
     keep_right = mean_cow[mean_cow['x'] >= left_wall + (right_wall+left_wall)/2].index
     keep_left = mean_cow[mean_cow['x'] < left_wall + (right_wall+left_wall)/2].index
     df_g2 = df[df["tag_id"].isin(keep_right)]
@@ -49,10 +59,13 @@ def cows_above_yline_right_left(df, barn_filename):
     return df_g2, df_g1
 
 def cows_between_time(df, t0, t1):
+    #Convert time to epoch time
     t0 = int(time.mktime(t0.timetuple()))*1000
     t1 = int(time.mktime(t1.timetuple()))*1000
+    #Select i closest to time
     index_t0 = df.iloc[(df['time']-t0).abs().argsort()[:1]].index
     index_t1 = df.iloc[(df['time']-t1).abs().argsort()[:1]].index
+    #Select Dataframe between index
     df = df[df.index.isin(range(index_t0[0], index_t1[0]))]
     return df
 
@@ -104,8 +117,26 @@ def assign_cows_to_bed(df, barn_filename):
     for i in range(len(bedarea)):  
         test = df[(df['x']  >= bedarea[i][1]) & (df['x']  < bedarea[i][3]) & (df['y']  >= bedarea[i][5]) & (df['y']  < bedarea[i][6])].index
         df.loc[test, "bed_id"] = i
+    df = df.dropna()
     return df
     
+# function to sort the cows into a new dataset looking at the beds
+def time_in_bed(df, df_beds):
+    u_cows = unique_cows(df)
+    for i in range(len(u_cows)):
+        tag_id = u_cows[i]
+        temp = df.loc[df['tag_id'] == tag_id]
+        bed_number = temp.groupby('bed_id').size().nlargest(2).index
+        for badnumber in bed_number:
+            if  not np.isfinite(df_beds.loc[badnumber]['1_tag_id']):
+                temp = temp.loc[temp['bed_id'] == badnumber]
+                new_row = {'1_tag_id': tag_id, '1_start_time': temp['time'].min(), '1_durration': round((temp['time'].max() - temp['time'].min())/60000)}
+                df_beds.loc[badnumber] = new_row
+            elif not np.isfinite(df_beds.loc[badnumber]['2_tag_id']):
+                temp = temp.loc[temp['bed_id'] == badnumber]
+                new_row = {'2_tag_id': tag_id, '2_start_time': temp['time'].min(), '2_durration': round((temp['time'].max() - temp['time'].min())/60000)}
+                df_beds.loc[badnumber]['2_tag_id', '2_start_time', '2_durration'] = new_row
+    return df_beds
 
 # function to sort the cows in bed based on startingtime
 def sort_beds_by_start_time(beds):
