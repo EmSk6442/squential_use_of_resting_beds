@@ -24,57 +24,28 @@ def unique_cows(df):
     return df.tag_id.unique()
 
 def remove_cows_missing_data_points(df):
-    tags = list()
-    u_cows = unique_cows(df)
-    maxlen = 0
-    for i in range(len(u_cows)):
-        temp = df.loc[df['tag_id'] == u_cows[i]]
-        x,y,z = positions(temp)
-        if len(x) > maxlen:
-            maxlen = len(x)
-    for i in range(len(u_cows)):
-        temp = df.loc[df['tag_id'] == u_cows[i]]
-        x,y,z = positions(temp)
-        if len(x) < maxlen*0.7:
-            tags.append(u_cows[i])
-    df = drop_tags_list(df, tags)
+    df_len = df.groupby("tag_id").size()
+    maxlen = df_len.max()
+    df_keep = df_len[df_len >= 0.7*maxlen].index
+    df = df[df["tag_id"].isin(df_keep)]
     return df
 
 # drop cows under y-line and divide into g1 and g2
 def cows_above_yline_right_left(df, barn_filename):
     barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
-    g1 = []
-    g2 = []
     left_wall = list(barn['x1'])[0]
     right_wall = list(barn['x3'])[0]
     y_line = 2595
-    u_cows = unique_cows(df)
-    for i in range(len(u_cows)):
-        temp = df.loc[df['tag_id'] == u_cows[i]]
-        x,y,z = positions(temp)
-        if y[0] > y_line:
-            if sum(x)/len(x) <= left_wall + (right_wall+left_wall)/2:
-                g2.append(u_cows[i])
-            else:
-                g1.append(u_cows[i])
-    g2_df = df[df['tag_id'].isin(g2)]
-    g1_df = df[df['tag_id'].isin(g1)]
-    return g2_df, g1_df
 
-# function to drop rows with certain tag_ids from list
-def drop_tags_list(df, tags):
-    for i in range(len(tags)):
-        df = df.drop(df[df.tag_id == tags[i]].index)
-    return df
-
-# function to drop rows with certain tag_ids
-def drop_tags(df, tags_filename):
-    tags = pd.read_csv(tags_filename, skiprows = 0, sep = ';', header=0)
-    tags.columns = ['position', 'Zx', 'Zy', 'tag_string', 'tag_id']
-    tag_ids = list(tags['tag_id'])
-    for i in range(len(tag_ids)):
-        df = df.drop(df[df.tag_id == tag_ids[i]].index)
-    return df
+    mean_cow = df.groupby('tag_id').mean()
+    df_keep = mean_cow[mean_cow['y'] >= y_line].index
+    df = df[df["tag_id"].isin(df_keep)]
+    
+    keep_right = mean_cow[mean_cow['x'] >= left_wall + (right_wall+left_wall)/2].index
+    keep_left = mean_cow[mean_cow['x'] < left_wall + (right_wall+left_wall)/2].index
+    df_g2 = df[df["tag_id"].isin(keep_right)]
+    df_g1 = df[df["tag_id"].isin(keep_left)]
+    return df_g2, df_g1
 
 def cows_between_time(df, t0, t1):
     t0 = int(time.mktime(t0.timetuple()))*1000
@@ -188,3 +159,9 @@ def plot_time(df, t1, t2):
     x,y,z = positions(temp)
     plt.scatter(x,y, s = 2)
     plt.show()
+
+
+
+####################################
+### Animations                  ####
+####################################
