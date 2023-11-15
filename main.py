@@ -45,12 +45,15 @@ g1_df_milk1 = func.assign_cows_to_bed(g1_df_milk1, barn_file)
 df_beds = func.bed_data_frame(barn_file)
 
 #Crossreference cows in bed
-df_beds = func.time_in_bed(g1_df_milk1, df_beds)
+#df_beds = func.time_in_bed(g1_df_milk1, df_beds)
 
 
-func.save_csv(df_beds)
+#func.save_csv(df_beds)
 #beds = func.sort_beds_by_start_time(beds)
 
-#animate_cows(df, cowID_1, cowID_2, barn_filename, save_path='n')
+# animation
+cowID_1 = 2432025
+cowID_2 = 2432118
+func.animate_cows(df, cowID_1, cowID_2, barn_file, save_path='n')
 
 # visualize
