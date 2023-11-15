@@ -40,3 +40,7 @@ optimera vår kod. Optimerat funktionerna cows_above_yline_right_left, remove_co
 2023-11-14
 Fortsatt optimera kod! skrev en funktion för att spara data i en cvs-fil och en som sorterar kossorna i
 sängar och försöker spara de två längsta tiderna för varje ko i rätt säng.
+
+2023-11-15
+Hållt en presentation för forskargruppen åp 10 min och fick feedback på vad vi ska kolla nogrannare på
+och mer data att kolla på. Vi jobbar på en ny algoritm för att sortera kossor in i sängar med noice reduction.
