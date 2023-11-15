@@ -22,7 +22,7 @@ def csv_read_FA(filename, nrows):
 # dataframe for beds
 def bed_data_frame(barn_filename):
     barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
-    df = pd.DataFrame(index = range(0, len(barn)-13), columns=['1_tag_id', '1_start_time', '1_durration', '2_tag_id', '2_start_time', '2_durration'])
+    df = pd.DataFrame(columns=['bed_id', 'tag_id', 'start_time', 'durration'])
     return df
 
 def save_csv(df):
@@ -126,16 +126,16 @@ def time_in_bed(df, df_beds):
     for i in range(len(u_cows)):
         tag_id = u_cows[i]
         temp = df.loc[df['tag_id'] == tag_id]
-        bed_number = temp.groupby('bed_id').size().nlargest(2).index
-        for badnumber in bed_number:
-            if  not np.isfinite(df_beds.loc[badnumber]['1_tag_id']):
-                temp = temp.loc[temp['bed_id'] == badnumber]
-                new_row = {'1_tag_id': tag_id, '1_start_time': temp['time'].min(), '1_durration': round((temp['time'].max() - temp['time'].min())/60000)}
-                df_beds.loc[badnumber] = new_row
-            elif not np.isfinite(df_beds.loc[badnumber]['2_tag_id']):
-                temp = temp.loc[temp['bed_id'] == badnumber]
-                new_row = {'2_tag_id': tag_id, '2_start_time': temp['time'].min(), '2_durration': round((temp['time'].max() - temp['time'].min())/60000)}
-                df_beds.loc[badnumber]['2_tag_id', '2_start_time', '2_durration'] = new_row
+        bed_numbers = temp.groupby('bed_id').size().max()
+        while bed_numbers > 900:
+            bed_number = temp.groupby('bed_id').size().idxmax()
+            temp1 = temp.loc[temp['bed_id'] == bed_number]
+            #Filter med för långt tid mellan punkterna
+            df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000)}
+            #Ta bort tiden mellan temp['time'].max() och .min()
+            #temp = temp.drop([temp1['time'].idxmin(), temp1['time'].idxmax()])
+            temp = temp.drop(temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index)
+            bed_numbers = temp.groupby('bed_id').size().max()
     return df_beds
 
 # function to sort the cows in bed based on startingtime
@@ -143,6 +143,9 @@ def sort_beds_by_start_time(beds):
     for i in range(len(beds)):
         beds[i] = sorted(beds[i], key=lambda value:value[1])
     return beds
+    
+def sort_beds(df):
+    return df.sort_values(by = ['bed_id', 'start_time']).reset_index()
     
 
 # cow iside bed
