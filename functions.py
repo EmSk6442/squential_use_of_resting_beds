@@ -55,8 +55,8 @@ def cows_above_yline_right_left(df, barn_filename):
     #Mean in either g1 or g2 
     keep_right = mean_cow[mean_cow['x'] >= left_wall + (right_wall+left_wall)/2].index
     keep_left = mean_cow[mean_cow['x'] < left_wall + (right_wall+left_wall)/2].index
-    df_g2 = df[df["tag_id"].isin(keep_right)]
-    df_g1 = df[df["tag_id"].isin(keep_left)]
+    df_g1 = df[df["tag_id"].isin(keep_right)]
+    df_g2 = df[df["tag_id"].isin(keep_left)]
     return df_g2, df_g1
 
 def cows_between_time(df, t0, t1):
@@ -68,6 +68,15 @@ def cows_between_time(df, t0, t1):
     index_t1 = df.iloc[(df['time']-t1).abs().argsort()[:1]].index
     #Select Dataframe between index
     df = df[df.index.isin(range(index_t0[0], index_t1[0]))]
+    return df
+
+# cow srart milking
+def cows_start_time_milking(df):
+    u_cows = unique_cows(df)
+    for i in u_cows:
+        temp = df.loc[df['tag_id'] == u_cows[i]]
+        temp = df.loc[df['y'] < 1310]
+        df = df.drop(temp.loc[:temp['time'].idxmin()])
     return df
 
 # find coordinates
@@ -118,11 +127,11 @@ def assign_cows_to_bed(df, barn_filename):
     for i in range(len(bedarea)):  
         test = df[(df['x']  >= bedarea[i][1]) & (df['x']  < bedarea[i][3]) & (df['y']  >= bedarea[i][5]) & (df['y']  < bedarea[i][6])].index
         df.loc[test, "bed_id"] = i
-    df = df.dropna()
     return df
     
 # function to sort the cows into a new dataset looking at the beds
 def time_in_bed(df, df_beds, points_in_bed):
+    df = df.dropna()
     u_cows = unique_cows(df)
     for i in range(len(u_cows)):
         tag_id = u_cows[i]

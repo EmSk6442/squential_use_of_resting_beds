@@ -20,7 +20,7 @@ df = func.csv_read_FA(file, nrows)
 g2_df, g1_df = func.cows_above_yline_right_left(df, barn_file)
 
 #print(len(g1_df))
-# divide df into milking 1 and milking 2
+# divide df into milking 1 and milking 2 based on enry to the milking parlor
 time_after_milking = 3
 g1_t0 = datetime.datetime(2020, 9, 22, 5, 0)
 g1_t1 = datetime.datetime(2020, 9, 22, 5 + time_after_milking, 0)
@@ -28,10 +28,11 @@ g1_t1 = datetime.datetime(2020, 9, 22, 5 + time_after_milking, 0)
 #g1_t3 = datetime.datetime(2020, 9, 22, 16 + time_after_milking, 30)
 g1_df_milk1 = func.cows_between_time(g1_df, g1_t0, g1_t1)
 #g1_df_milk2 = func.cows_between_time(g1_df, g1_t2, g1_t2)
-#print(len(g1_df_milk1))
+
+g1_df_milk1 = func.cows_start_time_milking(g1_df_milk1)
 
 #g2_t0 = datetime.datetime(2020, 9, 22, 7, 0)
-#g2_t1 = datetime.datetime(2020, 9, 22, 7 + time_after_milking, 2)
+#g2_t1 = datetime.datetime(2020, 9, 22, 7 + time_after_milking, 0)
 #g2_t2 = datetime.datetime(2020, 9, 22, 18, 30)
 #g2_t3 = datetime.datetime(2020, 9, 22, 18 + time_after_milking, 0)
 #g2_df_milk1 = func.cows_between_time(g2_df, g2_t0, g2_t1)
