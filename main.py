@@ -46,9 +46,9 @@ g1_df_milk1 = func.assign_cows_to_bed(g1_df_milk1, barn_file)
 df_beds = func.bed_data_frame(barn_file)
 
 #Crossreference cows in bed
-df_beds = func.time_in_bed(g1_df_milk1, df_beds)
+df_beds = func.time_in_bed(g1_df_milk1, df_beds, 900)
 
-#Sort beds by bed and starttime
+#Sort beds by bed and starttimes
 df_beds = func.sort_beds(df_beds)
 
 func.save_csv(df_beds)

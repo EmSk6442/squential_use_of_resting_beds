@@ -122,39 +122,30 @@ def assign_cows_to_bed(df, barn_filename):
     return df
     
 # function to sort the cows into a new dataset looking at the beds
-def time_in_bed(df, df_beds):
+def time_in_bed(df, df_beds, points_in_bed):
     u_cows = unique_cows(df)
     for i in range(len(u_cows)):
         tag_id = u_cows[i]
         temp = df.loc[df['tag_id'] == tag_id]
         bed_numbers = temp.groupby('bed_id').size().max()
-        while bed_numbers > 900:
+        while bed_numbers > points_in_bed:
             bed_number = temp.groupby('bed_id').size().idxmax()
             temp1 = temp.loc[temp['bed_id'] == bed_number]
             #Filter med för långt tid mellan punkterna
             temp1 = outliners(temp1)
-            #outliners(temp1)
-            df_beds[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000)}
-            #Ta bort tiden mellan temp['time'].max() och .min()
-            #temp = temp.drop([temp1['time'].idxmin(), temp1['time'].idxmax()])
+            # write in data into df_beds
+            df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000)}
+            # remove data when cow is in bed
             temp = temp.drop(temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index)
             bed_numbers = temp.groupby('bed_id').size().max()
     return df_beds
 
 def outliners(df):
-    #df[np.abs(stats.zscore(df['time'])) < 3]
-    print(df)
-
-    # Calculate the z-score
-    z = np.abs(stats.zscore(df['start_time']))
-
-    # Identify outliers as students with a z-score greater than 3
+    # Calculate the z-score for eaxh time
+    z = np.abs(stats.zscore(df['time']))
+    # Identify outliers with a z-score greater than 3 ie. 99,7 % 
     threshold = 3
     outliers = df[z > threshold]
-
-    # Print the outliers
-    print(outliers)
-    
     # drop rows containing outliers
     df = df.drop(outliers.index)
     return df
