@@ -46,6 +46,6 @@ Hållt en presentation för forskargruppen åp 10 min och fick feedback på vad 
 och mer data att kolla på. Vi jobbar på en ny algoritm för att sortera kossor in i sängar med noice reduction.
 
 2023-11-16
-Fått outliner funktionen att fungera. Kollat på datan som vi får ut just nu och ser att vi behöver modifiera
+Fått outliner-funktionen att fungera. Kollat på datan som vi får ut just nu och ser att vi behöver modifiera
 koden så att tiden för att hitta rätt sängar börjar först när mjölkningen börjar. Vi vill lägga till en
 funktion, cows_start_time_milking.
