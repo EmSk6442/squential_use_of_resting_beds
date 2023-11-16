@@ -9,6 +9,7 @@ from matplotlib.animation import FuncAnimation
 from matplotlib import transforms
 import datetime as datetime
 import time
+from scipy import stats
 
 # read csv-file
 def csv_read_FA(filename, nrows):
@@ -131,12 +132,32 @@ def time_in_bed(df, df_beds):
             bed_number = temp.groupby('bed_id').size().idxmax()
             temp1 = temp.loc[temp['bed_id'] == bed_number]
             #Filter med för långt tid mellan punkterna
-            df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000)}
+            temp1 = outliners(temp1)
+            #outliners(temp1)
+            df_beds[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000)}
             #Ta bort tiden mellan temp['time'].max() och .min()
             #temp = temp.drop([temp1['time'].idxmin(), temp1['time'].idxmax()])
             temp = temp.drop(temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index)
             bed_numbers = temp.groupby('bed_id').size().max()
     return df_beds
+
+def outliners(df):
+    #df[np.abs(stats.zscore(df['time'])) < 3]
+    print(df)
+
+    # Calculate the z-score
+    z = np.abs(stats.zscore(df['start_time']))
+
+    # Identify outliers as students with a z-score greater than 3
+    threshold = 3
+    outliers = df[z > threshold]
+
+    # Print the outliers
+    print(outliers)
+    
+    # drop rows containing outliers
+    df = df.drop(outliers.index)
+    return df
 
 # function to sort the cows in bed based on startingtime
 def sort_beds_by_start_time(beds):
@@ -145,7 +166,7 @@ def sort_beds_by_start_time(beds):
     return beds
     
 def sort_beds(df):
-    return df.sort_values(by = ['bed_id', 'start_time']).reset_index()
+    return df.sort_values(by = ['bed_id', 'start_time']).reset_index(drop=True)
     
 
 # cow iside bed
