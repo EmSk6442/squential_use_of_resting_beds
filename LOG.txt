@@ -55,3 +55,5 @@ Möte med Lars, vi kom fram till att vi ska skriva en funktion som tar ut ut pro
 är i en säng, hitta ett sätt att hitta mjölktiderna mha positionerna enbart, ta bort STATIONÄRA sändare, går 
 det att ha flera chunks för samma säng och tänka på att börja skriva rapport snart. Få ut en plot för hur många 
 kor som är i en säng och visualisera det med färger.
+Jobbat med att representera hur många kor som är i en säng efter mjölkning. Förbättrat algorytmen för att
+bestämma när vi börjar undersöka liggtiderna.
