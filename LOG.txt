@@ -49,3 +49,8 @@ och mer data att kolla på. Vi jobbar på en ny algoritm för att sortera kossor
 Fått outliner-funktionen att fungera. Kollat på datan som vi får ut just nu och ser att vi behöver modifiera
 koden så att tiden för att hitta rätt sängar börjar först när mjölkningen börjar. Vi vill lägga till en
 funktion, cows_start_time_milking.
+
+2023-11-20
+Möte med Lars, vi kom fram till att vi ska skriva en funktion som tar ut ut procenten på bruset för tiden kon
+är i en säng, hitta ett sätt att hitta mjölktiderna mha positionerna enbart, ta bort STATIONÄRA sändare, går 
+det att ha flera chunks för samma säng och tänka på att börja skriva rapport snart.
