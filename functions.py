@@ -23,7 +23,7 @@ def csv_read_FA(filename, nrows):
 # dataframe for beds
 def bed_data_frame(barn_filename):
     barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
-    df = pd.DataFrame(columns=['bed_id', 'tag_id', 'start_time', 'durration'])
+    df = pd.DataFrame(columns=['bed_id', 'tag_id', 'start_time', 'durration', '%_in_bed'])
     return df
 
 def save_csv(df):
@@ -71,13 +71,16 @@ def cows_between_time(df, t0, t1):
     return df
 
 # cow srart milking
-def cows_start_time_milking(df):
-    u_cows = unique_cows(df)
-    for i in u_cows:
-        temp = df.loc[df['tag_id'] == u_cows[i]]
-        temp = df.loc[df['y'] < 1310]
-        df = df.drop(temp.loc[:temp['time'].idxmin()])
-    return df
+def cows_start_time_milking(df, hours):
+    temp = df[df['y'] < 1310]
+    temp = temp.drop_duplicates(['tag_id'], keep = 'first')
+    t1 = hours*60*60*1000
+    t2 = 4*60*60*1000
+    ind1 = df.iloc[(df['time']-(temp['time'].min()+t1)).abs().argsort()[:1]].index
+    ind2 = df.iloc[(df['time']-(temp['time'].min()+t2)).abs().argsort()[:1]].index
+    temp = df.loc[temp['time'].idxmin():ind1[0]]
+    df = df.drop(df[:ind2[0]].index)
+    return temp, df
 
 # find coordinates
 def positions(df):
@@ -125,7 +128,7 @@ def assign_cows_to_bed(df, barn_filename):
     for i in range(13, len(barn)):
         bedarea.append(barn.iloc[i])
     for i in range(len(bedarea)):  
-        test = df[(df['x']  >= bedarea[i][1]) & (df['x']  < bedarea[i][3]) & (df['y']  >= bedarea[i][5]) & (df['y']  < bedarea[i][6])].index
+        test = df[(df['x'] >= bedarea[i][1]) & (df['x'] < bedarea[i][3]) & (df['y'] >= bedarea[i][5]) & (df['y'] < bedarea[i][6])].index
         df.loc[test, "bed_id"] = i
     return df
     
@@ -142,10 +145,11 @@ def time_in_bed(df, df_beds, points_in_bed):
             temp1 = temp.loc[temp['bed_id'] == bed_number]
             #Filter med för långt tid mellan punkterna
             temp1 = outliners(temp1)
+            remove = temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index
             # write in data into df_beds
-            df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000)}
+            df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000), '%_in_bed': round(bed_numbers/len(remove)*100)}
             # remove data when cow is in bed
-            temp = temp.drop(temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index)
+            temp = temp.drop(remove)
             bed_numbers = temp.groupby('bed_id').size().max()
     return df_beds
 
