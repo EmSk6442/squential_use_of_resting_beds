@@ -57,3 +57,6 @@ func.save_csv(df_beds)
 #func.animate_cows(df, cowID_1, cowID_2, barn_file, save_path='n')
 
 # visualize
+# visualize
+#fig,ax = func.plot_barn_color(barn_file,df_number_of_times)
+#plt.show()
