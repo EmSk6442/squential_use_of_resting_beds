@@ -231,6 +231,45 @@ def plot_time(df, t1, t2):
     plt.scatter(x,y, s = 2)
     plt.show()
 
+    # function to plot the outline of the barn with colors
+def plot_barn_color(filename,df_times):
+        df = pd.read_csv(filename, skiprows = 0, sep = ';', header=0)
+        df.columns = ['Unit', 'x1', 'x2', 'x3', 'x4', 'y1', 'y2', 'y3','y4']
+        units = list(df['Unit'])
+        x_1 = list(df['x1'])
+        x_2 = list(df['x2'])
+        x_3 = list(df['x3'])
+        x_4 = list(df['x4'])
+        y_1 = list(df['y1'])
+        y_2 = list(df['y2'])
+        y_3 = list(df['y3'])
+        y_4 = list(df['y4'])
+
+        fig, ax = plt.subplots(1,figsize=(3.75,6))
+        for i in range(len(units)):
+           art =  pat.Rectangle((x_1[i],min(y_1[i],y_2[i])),x_3[i]-x_1[i], max(y_1[i],y_2[i])-min(y_1[i],y_2[i]), fill = False)
+           ax.add_patch(art)
+
+        for i in range(len(df_times)):
+            if df_times.values[i] == 1:
+                art =  pat.Rectangle((x_1[int(df_times.index[i])+13],min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])),x_3[int(df_times.index[i])+13]-x_1[int(df_times.index[i])+13], max(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])-min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13]), edgecolor='black', facecolor="lightgreen", linewidth=0.5)
+            elif df_times.values[i] == 2:
+                art =  pat.Rectangle((x_1[int(df_times.index[i])+13],min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])),x_3[int(df_times.index[i])+13]-x_1[int(df_times.index[i])+13], max(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])-min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13]), edgecolor='black', facecolor="yellow", linewidth=0.5)
+            elif df_times.values[i] == 3:
+                art =  pat.Rectangle((x_1[int(df_times.index[i])+13],min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])),x_3[int(df_times.index[i])+13]-x_1[int(df_times.index[i])+13], max(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])-min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13]), edgecolor='black', facecolor="lightcoral", linewidth=0.5)
+            elif df_times.values[i] >= 4:
+                art =  pat.Rectangle((x_1[int(df_times.index[i])+13],min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])),x_3[int(df_times.index[i])+13]-x_1[int(df_times.index[i])+13], max(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13])-min(y_1[int(df_times.index[i])+13],y_2[int(df_times.index[i])+13]), edgecolor='black', facecolor="black", linewidth=0.5)
+            else:
+                art =  pat.Rectangle((x_1[i],min(y_1[i],y_2[i])),x_3[i]-x_1[i], max(y_1[i],y_2[i])-min(y_1[i],y_2[i]), fill = False, linewidth=0.5)
+            ax.add_patch(art)
+
+        patch1 = mpatches.Patch(color='lightgreen', label='1') 
+        patch2 = mpatches.Patch(color='yellow', label='2') 
+        patch3 = mpatches.Patch(color='lightcoral', label='3') 
+        ax.legend(title='Number of cows',handles=[patch1, patch2, patch3],loc='lower left')
+        ax.set_xlim(x_1[0],x_3[0])
+        ax.set_ylim(y_1[0],y_2[0])
+        return fig, ax
 
 
 ####################################
