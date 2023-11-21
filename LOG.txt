@@ -57,3 +57,7 @@ det att ha flera chunks för samma säng och tänka på att börja skriva rappor
 kor som är i en säng och visualisera det med färger.
 Jobbat med att representera hur många kor som är i en säng efter mjölkning. Förbättrat algorytmen för att
 bestämma när vi börjar undersöka liggtiderna.
+
+2023-11-21
+Jobbat på att hur vi ska visualisera våra resultat. Strukturerat upp rapporten och bokat studiebesök med Lars för 
+att åka till ladan för att hälsa på kossorna.
