@@ -61,3 +61,10 @@ bestämma när vi börjar undersöka liggtiderna.
 2023-11-21
 Jobbat på att hur vi ska visualisera våra resultat. Strukturerat upp rapporten och bokat studiebesök med Lars för 
 att åka till ladan för att hälsa på kossorna.
+
+2023-11-22
+La till två funktioner, en för att ta bort stationära sändare och en för att ladda in en mapp med flera datafiler
+från varje dag som sedan sparas i en mapp, två filer för en dag (mjökning1 och mjölkning 2). Hittade även ett
+problem när vi tar bort datapunkter i cows_start_time_milking, den tog inte bort rätt antal datapunkter efter
+en mjölkningstid vilket resulterade i att dataframen blev fel när den skickades vidare. Bokade möte med Hector
+imorgon.
