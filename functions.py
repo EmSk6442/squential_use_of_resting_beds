@@ -186,7 +186,9 @@ def is_inside(pos, bed):
     else:
         return False
 
-
+def remove_cons_trans(df):
+    df = df[~df['tag_id'].astype(str).str.startswith('22')]
+    return df
 
 ###############################################################################value[]
 ####                               PLOTS                                  #####
