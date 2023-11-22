@@ -28,6 +28,9 @@ file = dir_list[0]
 
 df = func.csv_read_FA(file, nrows)
 
+# remove constant transmittors
+df = func.remove_cons_trans(df)
+
 # removes cows with more than 70% datapoints missing 
 #df = func.remove_cows_missing_data_points(df)
 # sort out cows above y-line and per G1 or G2
