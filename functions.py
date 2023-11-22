@@ -10,6 +10,7 @@ from matplotlib import transforms
 import datetime as datetime
 import time
 from scipy import stats
+import os
 
 # read csv-file
 def csv_read_FA(filename, nrows):
@@ -20,14 +21,19 @@ def csv_read_FA(filename, nrows):
     df.columns = ['data_entity', 'tag_id', 'tag_string', 'time', 'x', 'y', 'z']
     return df
 
+# list of all files in directory
+def files_in_directory(path):
+    dir_list = os.listdir(path)
+    return dir_list
+
 # dataframe for beds
 def bed_data_frame(barn_filename):
     barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
     df = pd.DataFrame(columns=['bed_id', 'tag_id', 'start_time', 'durration', '%_in_bed'])
     return df
 
-def save_csv(df):
-    df.to_csv('test.csv')
+def save_csv(df, name, dir):
+    df.to_csv(dir + name + '.csv')
 
 # number of cows
 def unique_cows(df):
