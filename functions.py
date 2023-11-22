@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import pandas as pd
 from random import randint
 import math
@@ -12,6 +11,58 @@ import datetime as datetime
 import time
 from scipy import stats
 import os
+
+# function
+def mainframe(file, nrows, barn_file, bed_dir, hours):
+    # initialize whole dataframe
+    df = csv_read_FA(file, nrows)
+
+    # remove constant transmittors
+    df = remove_cons_trans(df)
+
+    # split cows into groups
+    g2_df, g1_df = cows_above_yline_right_left(df, barn_file)
+
+    # divide df into milking 1 and milking 2 based on enry to the milking parlor
+    g1_df_milk1, g1_df = cows_start_time_milking(g1_df, hours)
+    g1_df_milk2, g1_df = cows_start_time_milking(g1_df, hours)
+
+    g2_df_milk1, g2_df = cows_start_time_milking(g2_df, hours)
+    g2_df_milk2, g2_df = cows_start_time_milking(g2_df, hours)
+
+    # assign cows to a bed in the
+    g1_df_milk1 = assign_cows_to_bed(g1_df_milk1, barn_file)
+    g1_df_milk2 = assign_cows_to_bed(g1_df_milk2, barn_file)
+    
+    g2_df_milk1 = assign_cows_to_bed(g2_df_milk1, barn_file)
+    g2_df_milk2 = assign_cows_to_bed(g2_df_milk2, barn_file)
+
+    # initalize dataframe beds
+    df_beds_milk1 = bed_data_frame(barn_file)
+    df_beds_milk2 = bed_data_frame(barn_file)
+
+    # crossreference cows in bed
+    df_beds_milk1 = time_in_bed(g1_df_milk1, df_beds_milk1, 900)
+    df_beds_milk1 = time_in_bed(g2_df_milk1, df_beds_milk1, 900)
+    
+    df_beds_milk2 = time_in_bed(g1_df_milk2, df_beds_milk2, 900)
+    df_beds_milk2 = time_in_bed(g2_df_milk2, df_beds_milk2, 900)
+
+    # sort beds by bed and starttimes
+    df_beds_milk1 = sort_beds(df_beds_milk1)
+    df_beds_milk2 = sort_beds(df_beds_milk2)
+
+    #Save each days data
+    name1 = file.replace('.\FA-Data\FA_', '') + '_milk1'
+    name1 = name1.replace('.csv', '')
+    save_csv(df_beds_milk1, name1, bed_dir)
+
+    name2 = file.replace('.\FA-Data\FA_', '') + '_milk2'
+    name2 = name2.replace('.csv', '')
+    save_csv(df_beds_milk2, name2, bed_dir)
+    
+    return df_beds_milk1, df_beds_milk2
+
 
 # read csv-file
 def csv_read_FA(filename, nrows):
@@ -85,9 +136,9 @@ def cows_start_time_milking(df, hours):
     t2 = 4*60*60*1000
     ind1 = df.iloc[(df['time']-(temp['time'].min()+t1)).abs().argsort()[:1]].index
     ind2 = df.iloc[(df['time']-(temp['time'].min()+t2)).abs().argsort()[:1]].index
-    temp = df.loc[temp['time'].idxmin():ind1[0]]
-    df = df.drop(df[:ind2[0]].index)
-    return temp, df
+    df_milk = df.loc[temp['time'].idxmin():ind1[0]]
+    df = df.truncate(before=ind2[0])
+    return df_milk, df
 
 # find coordinates
 def positions(df):
