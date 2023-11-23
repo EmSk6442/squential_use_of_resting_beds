@@ -68,3 +68,7 @@ från varje dag som sedan sparas i en mapp, två filer för en dag (mjökning1 o
 problem när vi tar bort datapunkter i cows_start_time_milking, den tog inte bort rätt antal datapunkter efter
 en mjölkningstid vilket resulterade i att dataframen blev fel när den skickades vidare. Bokade möte med Hector
 imorgon.
+
+2023-11-23
+Möte med Hector om hur långt vi kommit och vi fick några fler artiklar till hjälp när vi skriver rapporten. Han
+visade även vad resultatet kan användas till senare. Spånade vidare hur vi ska använda resultatet och hur vi ska gå vidare.
