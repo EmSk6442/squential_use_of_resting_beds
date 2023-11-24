@@ -72,3 +72,7 @@ imorgon.
 2023-11-23
 Möte med Hector om hur långt vi kommit och vi fick några fler artiklar till hjälp när vi skriver rapporten. Han
 visade även vad resultatet kan användas till senare. Spånade vidare hur vi ska använda resultatet och hur vi ska gå vidare.
+
+2023-11-24
+Börjat skriva rapport, introduktion och metod. Även läst igenom fler artiklar för att lättare skriva rapporten på
+ett förståligt sätt. Vi ska även lägga till några fler sängar i vår barn-fil som vi inte lagt in förut.
