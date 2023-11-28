@@ -103,7 +103,7 @@ def cows_above_yline_right_left(df, barn_filename):
     barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
     left_wall = list(barn['x1'])[0]
     right_wall = list(barn['x3'])[0]
-    y_line = 2595
+    y_line = 1695
 
     #Mean above y-line
     mean_cow = df.groupby('tag_id')[['x', 'y']].mean()
