@@ -76,3 +76,15 @@ visade även vad resultatet kan användas till senare. Spånade vidare hur vi sk
 2023-11-24
 Börjat skriva rapport, introduktion och metod. Även läst igenom fler artiklar för att lättare skriva rapporten på
 ett förståligt sätt. Vi ska även lägga till några fler sängar i vår barn-fil som vi inte lagt in förut.
+
+2023-11-27
+Föreläsning på eftermiddagen. Fortsatt skriva på rapporten, introduktion och metoden.
+
+2023-11-28
+Föreläsning på eftermiddagen. Fortsatt skriva på rapporten, introduktion och metoden.
+
+2023-11-29
+Möte med Lars och de andra grupperna. Bättre lösning av när mjöltiden startar, 30sek eller något man kan tillämpa på hela
+datasetet. Vi kan representera koden så att vi visar när korna väljs ut till en säng och hur de tas bort för att man sen
+väljer nästa säng som används. FLER ILLUSTRATIONER. Gör histogram på när korna går till sängarna. Ta ut en lista på sängar
+som används fler gånger och kolla tiderna när de används och så det inte är några error. Skriver på rapporten, intro och metod.
