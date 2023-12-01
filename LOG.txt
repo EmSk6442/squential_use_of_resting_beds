@@ -88,3 +88,11 @@ Möte med Lars och de andra grupperna. Bättre lösning av när mjöltiden start
 datasetet. Vi kan representera koden så att vi visar när korna väljs ut till en säng och hur de tas bort för att man sen
 väljer nästa säng som används. FLER ILLUSTRATIONER. Gör histogram på när korna går till sängarna. Ta ut en lista på sängar
 som används fler gånger och kolla tiderna när de används och så det inte är några error. Skriver på rapporten, intro och metod.
+
+2023-11-30
+Föreläsning på eftermiddagen.
+
+2023-12-01
+Vi har kollat på hur man kan göra histogram, av tillexmpel när kossorna går till sängarna efter mjölkning. Ändrat funktionen
+cows_start_time_milking så att den tar bort tidpunkterna före kon går ner för mjölkning. Vi kan också ta ut ett dataframe 
+med sängarna som används flera gånger.
