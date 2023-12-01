@@ -52,6 +52,10 @@ def mainframe(file, nrows, barn_file, bed_dir, hours):
     df_beds_milk1 = sort_beds(df_beds_milk1)
     df_beds_milk2 = sort_beds(df_beds_milk2)
 
+    # List with beds that are used more than once
+    df_duplicate_milk1 = df_beds_milk1[df_beds_milk1.duplicated('bed_id', keep=False)]
+    df_duplicate_milk2 = df_beds_milk2[df_beds_milk2.duplicated('bed_id', keep=False)]
+
     #Save each days data
     name1 = file.replace('.\FA-Data\FA_', '') + '_milk1'
     name1 = name1.replace('.csv', '')
