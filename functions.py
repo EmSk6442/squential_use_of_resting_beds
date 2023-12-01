@@ -118,13 +118,13 @@ def cows_above_yline_right_left(df, barn_filename):
     return df_g2, df_g1
 
 def cows_between_time(df, t0, t1):
-    #Convert time to epoch time
+    # convert time to epoch time
     t0 = int(time.mktime(t0.timetuple()))*1000
     t1 = int(time.mktime(t1.timetuple()))*1000
-    #Select i closest to time
+    # select i closest to time
     index_t0 = df.iloc[(df['time']-t0).abs().argsort()[:1]].index
     index_t1 = df.iloc[(df['time']-t1).abs().argsort()[:1]].index
-    #Select Dataframe between index
+    # select Dataframe between index
     df = df[df.index.isin(range(index_t0[0], index_t1[0]))]
     return df
 
@@ -137,6 +137,10 @@ def cows_start_time_milking(df, hours):
     ind1 = df.iloc[(df['time']-(temp['time'].min()+t1)).abs().argsort()[:1]].index
     ind2 = df.iloc[(df['time']-(temp['time'].min()+t2)).abs().argsort()[:1]].index
     df_milk = df.loc[temp['time'].idxmin():ind1[0]]
+    u_cows = unique_cows(temp)
+    for i in range(len(u_cows)):
+        remove = df_milk.loc[df_milk['tag_id'] == u_cows[i]].loc[:temp.index[i]].index
+        df_milk = df_milk.drop(remove)
     df = df.truncate(before=ind2[0])
     return df_milk, df
 
