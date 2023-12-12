@@ -122,4 +122,8 @@ def outliers(df):
     df = df.drop(outliers)
     return df
 
+def sort_beds(df_bed):
+    df_bed = df_bed.sort(['bed_id', 'start_time'])
+    return df_bed
+
 main()
