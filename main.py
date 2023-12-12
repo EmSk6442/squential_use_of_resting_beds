@@ -25,16 +25,4 @@ df_beds_milk1, df_beds_milk2 = func.mainframe(file, nrows, barn_file, bed_dir, h
     
     # undersök kossorna med fler kossor i samma säng
     # plot av ladan med kossor
-# figure of used beds
-#df_number_of_times = df_beds_milk1.groupby('bed_id').size()
-#fig,ax = func.plot_barn_color(barn_file,df_number_of_times)
-#plt.show()
-
-# Histogram
-#hist = df_beds_milk1['start_time'].hist(bins=20)
-#plt.show()
-
-# animation
-#cowID_1 = 2432139
-#cowID_2 = 2428880
-#func.animate_cows(g1_df_milk1, cowID_1, cowID_2, barn_file, save_path='n')
+    

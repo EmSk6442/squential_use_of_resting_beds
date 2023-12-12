@@ -15,8 +15,10 @@ import os
 # function
 def mainframe(file, nrows, barn_file, bed_dir, hours):
     # initialize whole dataframe
+    t = time.time()
     df = csv_read_FA(file, nrows)
-
+    print(time.time()-t)
+    
     # remove constant transmittors
     df = remove_cons_trans(df)
 
@@ -31,11 +33,13 @@ def mainframe(file, nrows, barn_file, bed_dir, hours):
     g2_df_milk2, g2_df = cows_start_time_milking(g2_df, hours)
 
     # assign cows to a bed in the
+    t = time.time()
     g1_df_milk1 = assign_cows_to_bed(g1_df_milk1, barn_file)
     g1_df_milk2 = assign_cows_to_bed(g1_df_milk2, barn_file)
     
     g2_df_milk1 = assign_cows_to_bed(g2_df_milk1, barn_file)
     g2_df_milk2 = assign_cows_to_bed(g2_df_milk2, barn_file)
+    print(time.time() - t)
 
     # initalize dataframe beds
     df_beds_milk1 = bed_data_frame(barn_file)
@@ -51,10 +55,6 @@ def mainframe(file, nrows, barn_file, bed_dir, hours):
     # sort beds by bed and starttimes
     df_beds_milk1 = sort_beds(df_beds_milk1)
     df_beds_milk2 = sort_beds(df_beds_milk2)
-
-    # List with beds that are used more than once
-    df_duplicate_milk1 = df_beds_milk1[df_beds_milk1.duplicated('bed_id', keep=False)]
-    df_duplicate_milk2 = df_beds_milk2[df_beds_milk2.duplicated('bed_id', keep=False)]
 
     #Save each days data
     name1 = file.replace('.\FA-Data\FA_', '') + '_milk1'
@@ -135,16 +135,13 @@ def cows_between_time(df, t0, t1):
 # cow srart milking
 def cows_start_time_milking(df, hours):
     temp = df[df['y'] < 1310]
+    # another check if the milking time started
     temp = temp.drop_duplicates(['tag_id'], keep = 'first')
     t1 = hours*60*60*1000
     t2 = 4*60*60*1000
     ind1 = df.iloc[(df['time']-(temp['time'].min()+t1)).abs().argsort()[:1]].index
     ind2 = df.iloc[(df['time']-(temp['time'].min()+t2)).abs().argsort()[:1]].index
     df_milk = df.loc[temp['time'].idxmin():ind1[0]]
-    u_cows = unique_cows(temp)
-    for i in range(len(u_cows)):
-        remove = df_milk.loc[df_milk['tag_id'] == u_cows[i]].loc[:temp.index[i]].index
-        df_milk = df_milk.drop(remove)
     df = df.truncate(before=ind2[0])
     return df_milk, df
 
