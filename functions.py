@@ -15,15 +15,16 @@ import os
 # function
 def mainframe(file, nrows, barn_file, bed_dir, hours):
     # initialize whole dataframe
-    t = time.time()
     df = csv_read_FA(file, nrows)
-    print(time.time()-t)
     
     # remove constant transmittors
     df = remove_cons_trans(df)
 
+    # read barnfile
+    barn = pd.read_csv(barn_file, skiprows = 0, sep = ';', header=0)
+
     # split cows into groups
-    g2_df, g1_df = cows_above_yline_right_left(df, barn_file)
+    g2_df, g1_df = cows_above_yline_right_left(df, barn)
 
     # divide df into milking 1 and milking 2 based on enry to the milking parlor
     g1_df_milk1, g1_df = cows_start_time_milking(g1_df, hours)
@@ -33,17 +34,15 @@ def mainframe(file, nrows, barn_file, bed_dir, hours):
     g2_df_milk2, g2_df = cows_start_time_milking(g2_df, hours)
 
     # assign cows to a bed in the
-    t = time.time()
-    g1_df_milk1 = assign_cows_to_bed(g1_df_milk1, barn_file)
-    g1_df_milk2 = assign_cows_to_bed(g1_df_milk2, barn_file)
+    g1_df_milk1 = assign_cows_to_bed(g1_df_milk1, barn)
+    g1_df_milk2 = assign_cows_to_bed(g1_df_milk2, barn)
     
-    g2_df_milk1 = assign_cows_to_bed(g2_df_milk1, barn_file)
-    g2_df_milk2 = assign_cows_to_bed(g2_df_milk2, barn_file)
-    print(time.time() - t)
+    g2_df_milk1 = assign_cows_to_bed(g2_df_milk1, barn)
+    g2_df_milk2 = assign_cows_to_bed(g2_df_milk2, barn)
 
     # initalize dataframe beds
-    df_beds_milk1 = bed_data_frame(barn_file)
-    df_beds_milk2 = bed_data_frame(barn_file)
+    df_beds_milk1 = bed_data_frame()
+    df_beds_milk2 = bed_data_frame()
 
     # crossreference cows in bed
     df_beds_milk1 = time_in_bed(g1_df_milk1, df_beds_milk1, 900)
@@ -53,8 +52,10 @@ def mainframe(file, nrows, barn_file, bed_dir, hours):
     df_beds_milk2 = time_in_bed(g2_df_milk2, df_beds_milk2, 900)
 
     # sort beds by bed and starttimes
+    
     df_beds_milk1 = sort_beds(df_beds_milk1)
     df_beds_milk2 = sort_beds(df_beds_milk2)
+    
 
     #Save each days data
     name1 = file.replace('.\FA-Data\FA_', '') + '_milk1'
@@ -83,8 +84,7 @@ def files_in_directory(path):
     return dir_list
 
 # dataframe for beds
-def bed_data_frame(barn_filename):
-    barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
+def bed_data_frame():
     df = pd.DataFrame(columns=['bed_id', 'tag_id', 'start_time', 'durration', '%_in_bed'])
     return df
 
@@ -103,8 +103,7 @@ def remove_cows_missing_data_points(df):
     return df
 
 # drop cows under y-line and divide into g1 and g2
-def cows_above_yline_right_left(df, barn_filename):
-    barn = pd.read_csv(barn_filename, skiprows = 0, sep = ';', header=0)
+def cows_above_yline_right_left(df, barn):
     left_wall = list(barn['x1'])[0]
     right_wall = list(barn['x3'])[0]
     y_line = 1695
@@ -153,15 +152,13 @@ def positions(df):
     return x,y,z
 
 # function to assign a cow to bed based on how long the cow is in the bed
-def assign_cows_to_beds(df, barn_filename):
+def assign_cows_to_beds(df, barn):
     u_cows = unique_cows(df)   #Get a list of the unique cows ID:s
-
-    barn = pd.read_csv(barn_filename, skiprows=0, sep=';', header=0)            #Read the barn beds coordinates
-    #barn.columns = ['Unit', 'x1', 'x2', 'x3', 'x4', 'y1', 'y2', 'y3', 'y4']
 
     bedarea = []
     for i in range(13, len(barn)):
         bedarea.append(barn.iloc[i])
+    
     beds = {}
     for i in range(len(bedarea)):
         beds[i] = []
@@ -184,14 +181,13 @@ def assign_cows_to_beds(df, barn_filename):
                             continue
     return beds      #Return a list of lists of the ID:s of cows in different beds
 
-def assign_cows_to_bed(df, barn_filename):
+def assign_cows_to_bed(df, barn):
     df["bed_id"] = np.nan
-    barn = pd.read_csv(barn_filename, skiprows=0, sep=';', header=0)
-    bedarea = list()
-    for i in range(13, len(barn)):
-        bedarea.append(barn.iloc[i])
+
+    bedarea = barn[13:].reset_index()
+    
     for i in range(len(bedarea)):  
-        test = df[(df['x'] >= bedarea[i][1]) & (df['x'] < bedarea[i][3]) & (df['y'] >= bedarea[i][5]) & (df['y'] < bedarea[i][6])].index
+        test = df[(df['x'] >= bedarea['x1'][i]) & (df['x'] < bedarea['x3'][i]) & (df['y'] >= bedarea['y1'][i]) & (df['y'] < bedarea['y2'][i])].index
         df.loc[test, "bed_id"] = i
     return df
     
@@ -199,8 +195,7 @@ def assign_cows_to_bed(df, barn_filename):
 def time_in_bed(df, df_beds, points_in_bed):
     df = df.dropna()
     u_cows = unique_cows(df)
-    for i in range(len(u_cows)):
-        tag_id = u_cows[i]
+    for tag_id in u_cows:
         temp = df.loc[df['tag_id'] == tag_id]
         bed_numbers = temp.groupby('bed_id').size().max()
         while bed_numbers > points_in_bed:
