@@ -1,19 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from random import randint
 import math
-import matplotlib.lines as mlines
 import matplotlib.patches as pat
 from matplotlib.animation import FuncAnimation
-from matplotlib import transforms
 import datetime as datetime
 import time
 from scipy import stats
 import os
 
 # function
-def mainframe(file, nrows, barn_file, bed_dir, hours):
+def mainframe(file, nrows, barn_file, bed_dir, hours, hours_to_next_milking, points):
+    ### Data extraction ###
     # initialize whole dataframe
     df = csv_read_FA(file, nrows)
     
@@ -27,12 +25,13 @@ def mainframe(file, nrows, barn_file, bed_dir, hours):
     g2_df, g1_df = cows_above_yline_right_left(df, barn)
 
     # divide df into milking 1 and milking 2 based on enry to the milking parlor
-    g1_df_milk1, g1_df = cows_start_time_milking(g1_df, hours)
-    g1_df_milk2, g1_df = cows_start_time_milking(g1_df, hours)
+    g1_df_milk1, g1_df = cows_start_time_milking(g1_df, hours, hours_to_next_milking)
+    g1_df_milk2, g1_df = cows_start_time_milking(g1_df, hours, hours_to_next_milking)
 
-    g2_df_milk1, g2_df = cows_start_time_milking(g2_df, hours)
-    g2_df_milk2, g2_df = cows_start_time_milking(g2_df, hours)
+    g2_df_milk1, g2_df = cows_start_time_milking(g2_df, hours, hours_to_next_milking)
+    g2_df_milk2, g2_df = cows_start_time_milking(g2_df, hours, hours_to_next_milking)
 
+    ### Analysing data ###
     # assign cows to a bed in the
     g1_df_milk1 = assign_cows_to_bed(g1_df_milk1, barn)
     g1_df_milk2 = assign_cows_to_bed(g1_df_milk2, barn)
@@ -45,18 +44,16 @@ def mainframe(file, nrows, barn_file, bed_dir, hours):
     df_beds_milk2 = bed_data_frame()
 
     # crossreference cows in bed
-    df_beds_milk1 = time_in_bed(g1_df_milk1, df_beds_milk1, 900)
-    df_beds_milk1 = time_in_bed(g2_df_milk1, df_beds_milk1, 900)
+    df_beds_milk1 = time_in_bed(g1_df_milk1, df_beds_milk1, points, hours_to_next_milking)
+    df_beds_milk1 = time_in_bed(g2_df_milk1, df_beds_milk1, points, hours_to_next_milking)
     
-    df_beds_milk2 = time_in_bed(g1_df_milk2, df_beds_milk2, 900)
-    df_beds_milk2 = time_in_bed(g2_df_milk2, df_beds_milk2, 900)
+    df_beds_milk2 = time_in_bed(g1_df_milk2, df_beds_milk2, points, hours_to_next_milking)
+    df_beds_milk2 = time_in_bed(g2_df_milk2, df_beds_milk2, points, hours_to_next_milking)
 
     # sort beds by bed and starttimes
-    
     df_beds_milk1 = sort_beds(df_beds_milk1)
     df_beds_milk2 = sort_beds(df_beds_milk2)
     
-
     #Save each days data
     name1 = file.replace('.\FA-Data\FA_', '') + '_milk1'
     name1 = name1.replace('.csv', '')
@@ -78,11 +75,6 @@ def csv_read_FA(filename, nrows):
     df.columns = ['data_entity', 'tag_id', 'tag_string', 'time', 'x', 'y', 'z']
     return df
 
-# list of all files in directory
-def files_in_directory(path):
-    dir_list = os.listdir(path)
-    return dir_list
-
 # dataframe for beds
 def bed_data_frame():
     df = pd.DataFrame(columns=['bed_id', 'tag_id', 'start_time', 'durration', '%_in_bed'])
@@ -100,6 +92,11 @@ def remove_cows_missing_data_points(df):
     maxlen = df_len.max()
     df_keep = df_len[df_len >= 0.7*maxlen].index
     df = df[df["tag_id"].isin(df_keep)]
+    return df
+
+# remove constant trans
+def remove_cons_trans(df):
+    df = df[~df['tag_id'].astype(str).str.startswith('22')]
     return df
 
 # drop cows under y-line and divide into g1 and g2
@@ -132,54 +129,18 @@ def cows_between_time(df, t0, t1):
     return df
 
 # cow srart milking
-def cows_start_time_milking(df, hours):
+def cows_start_time_milking(df, hours, hours_to_next_milking):
     temp = df[df['y'] < 1310]
     # another check if the milking time started
     temp = temp.drop_duplicates(['tag_id'], keep = 'first')
     t1 = hours*60*60*1000
-    t2 = 4*60*60*1000
+    t2 = hours_to_next_milking*60*60*1000
     ind1 = df.iloc[(df['time']-(temp['time'].min()+t1)).abs().argsort()[:1]].index
     ind2 = df.iloc[(df['time']-(temp['time'].min()+t2)).abs().argsort()[:1]].index
     df_milk = df.loc[temp['time'].idxmin():ind1[0]]
     df = df.truncate(before=ind2[0])
     return df_milk, df
 
-# find coordinates
-def positions(df):
-    x = list(df['x'])
-    y = list(df['y'])
-    z = list(df['z'])
-    return x,y,z
-
-# function to assign a cow to bed based on how long the cow is in the bed
-def assign_cows_to_beds(df, barn):
-    u_cows = unique_cows(df)   #Get a list of the unique cows ID:s
-
-    bedarea = []
-    for i in range(13, len(barn)):
-        bedarea.append(barn.iloc[i])
-    
-    beds = {}
-    for i in range(len(bedarea)):
-        beds[i] = []
-
-    for i in range(len(u_cows)):
-        temp = df.loc[df['tag_id'] == u_cows[i]]
-        x, y, z = positions(temp)   #Get the positions from the cow
-        time = list(temp['time'])
-        start_time = time[0]
-        stop_time = time[-1]
-        for j in range(1, len(x)-1): #For each position, assign it to a bed
-            for k in range(len(bedarea)):
-                if is_inside((x[j], y[j]), bedarea[k]) == True:
-                    if not is_inside((x[j-1], y[j-1]), bedarea[k]):   #start time when entering booth
-                        start_time = time[j]
-                    elif is_inside((x[j], y[j]), bedarea[k]) and not is_inside((x[j+1], y[j+1]), bedarea[k]): #stayes in booth
-                        stop_time = time[j]
-                        if (stop_time - start_time)/1000 > 60:
-                            beds[k].append([u_cows[i], start_time, stop_time, round((stop_time - start_time)/1000)])
-                            continue
-    return beds      #Return a list of lists of the ID:s of cows in different beds
 
 def assign_cows_to_bed(df, barn):
     df["bed_id"] = np.nan
@@ -201,48 +162,39 @@ def time_in_bed(df, df_beds, points_in_bed):
         while bed_numbers > points_in_bed:
             bed_number = temp.groupby('bed_id').size().idxmax()
             temp1 = temp.loc[temp['bed_id'] == bed_number]
-            #Filter med för långt tid mellan punkterna
-            temp1 = outliners(temp1)
-            remove = temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index
+            # filter for outliers
+            temp1 = outliers(temp1)
             # write in data into df_beds
             df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000), '%_in_bed': round(bed_numbers/len(remove)*100)}
             # remove data when cow is in bed
+            remove = temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index
             temp = temp.drop(remove)
+            # check next bed
             bed_numbers = temp.groupby('bed_id').size().max()
     return df_beds
 
-def outliners(df):
+def outliers(df):
     # Calculate the z-score for eaxh time
     z = np.abs(stats.zscore(df['time']))
     # Identify outliers with a z-score greater than 3 ie. 99,7 % 
     threshold = 3
-    outliers = df[z > threshold]
+    outliers = df[z > threshold].index
     # drop rows containing outliers
-    df = df.drop(outliers.index)
+    df = df.drop(outliers)
     return df
 
 # function to sort the cows in bed based on startingtime
-def sort_beds_by_start_time(beds):
-    for i in range(len(beds)):
-        beds[i] = sorted(beds[i], key=lambda value:value[1])
-    return beds
-    
 def sort_beds(df):
     return df.sort_values(by = ['bed_id', 'start_time']).reset_index(drop=True)
-    
 
-# cow iside bed
-def is_inside(pos, bed):
-    if bed['x1'] < pos[0] < bed['x3'] and bed['y1'] < pos[1] < bed['y2']:
-        return True
-    else:
-        return False
+# find coordinates
+def positions(df):
+    x = list(df['x'])
+    y = list(df['y'])
+    z = list(df['z'])
+    return x,y,z
 
-def remove_cons_trans(df):
-    df = df[~df['tag_id'].astype(str).str.startswith('22')]
-    return df
-
-###############################################################################value[]
+###############################################################################
 ####                               PLOTS                                  #####
 ###############################################################################
 
