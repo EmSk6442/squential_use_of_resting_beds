@@ -44,11 +44,11 @@ def mainframe(file, nrows, barn_file, bed_dir, hours, hours_to_next_milking, poi
     df_beds_milk2 = bed_data_frame()
 
     # crossreference cows in bed
-    df_beds_milk1 = time_in_bed(g1_df_milk1, df_beds_milk1, points, hours_to_next_milking)
-    df_beds_milk1 = time_in_bed(g2_df_milk1, df_beds_milk1, points, hours_to_next_milking)
+    df_beds_milk1 = time_in_bed(g1_df_milk1, df_beds_milk1, points)
+    df_beds_milk1 = time_in_bed(g2_df_milk1, df_beds_milk1, points)
     
-    df_beds_milk2 = time_in_bed(g1_df_milk2, df_beds_milk2, points, hours_to_next_milking)
-    df_beds_milk2 = time_in_bed(g2_df_milk2, df_beds_milk2, points, hours_to_next_milking)
+    df_beds_milk2 = time_in_bed(g1_df_milk2, df_beds_milk2, points)
+    df_beds_milk2 = time_in_bed(g2_df_milk2, df_beds_milk2, points)
 
     # sort beds by bed and starttimes
     df_beds_milk1 = sort_beds(df_beds_milk1)
@@ -133,6 +133,7 @@ def cows_start_time_milking(df, hours, hours_to_next_milking):
     temp = df[df['y'] < 1310]
     # another check if the milking time started
     temp = temp.drop_duplicates(['tag_id'], keep = 'first')
+    temp = outliers(temp)
     t1 = hours*60*60*1000
     t2 = hours_to_next_milking*60*60*1000
     ind1 = df.iloc[(df['time']-(temp['time'].min()+t1)).abs().argsort()[:1]].index
@@ -164,10 +165,11 @@ def time_in_bed(df, df_beds, points_in_bed):
             temp1 = temp.loc[temp['bed_id'] == bed_number]
             # filter for outliers
             temp1 = outliers(temp1)
-            # write in data into df_beds
-            df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000), '%_in_bed': round(bed_numbers/len(remove)*100)}
+            bed_numbers = temp1.groupby('bed_id').size().max()
             # remove data when cow is in bed
             remove = temp.loc[temp1['time'].idxmin():temp1['time'].idxmax()].index
+            # write in data into df_beds
+            df_beds.loc[len(df_beds)] = {'bed_id': bed_number, 'tag_id': tag_id, 'start_time': temp1['time'].min(), 'durration': round((temp1['time'].max() - temp1['time'].min())/60000), '%_in_bed': round(bed_numbers/len(remove)*100)}
             temp = temp.drop(remove)
             # check next bed
             bed_numbers = temp.groupby('bed_id').size().max()
@@ -177,7 +179,7 @@ def outliers(df):
     # Calculate the z-score for eaxh time
     z = np.abs(stats.zscore(df['time']))
     # Identify outliers with a z-score greater than 3 ie. 99,7 % 
-    threshold = 3
+    threshold = 2
     outliers = df[z > threshold].index
     # drop rows containing outliers
     df = df.drop(outliers)
