@@ -96,3 +96,48 @@ Föreläsning på eftermiddagen.
 Vi har kollat på hur man kan göra histogram, av tillexmpel när kossorna går till sängarna efter mjölkning. Ändrat funktionen
 cows_start_time_milking så att den tar bort tidpunkterna före kon går ner för mjölkning. Vi kan också ta ut ett dataframe 
 med sängarna som används flera gånger.
+
+2023-12-04
+Undersökt om biblioteket Polars skulle göra koden snabbara att köra.
+
+2023-12-05
+Forsatt undersöka biblioteket Polars. Även hittat några buggar i den Pandaskoden.
+
+2023-12-06
+Forsatt undersöka biblioteket Polars.
+
+2023-12-07
+Forsatt undersöka biblioteket Polars.
+
+2023-12-08
+Forsatt undersöka biblioteket Polars. 
+
+2023-12-11
+Kommit fram till att Polars är ett bra bibliotek men att parallellisera vår Pandas kod är bättre. 
+
+2023-12-12
+Framtagande av resultat och sammanställningen av en presentation av det totala resultatet av vårt projekt. Både till rapporten och presentationen.
+
+2023-12-13
+Presentation av resultatet till forskningsgruppen. 
+
+2023-12-14
+Studiebesök på Lövsta research center för att få en större förståelse av vilken sorts forskning som görs på mjölkningskossorna.
+
+2023-12-15
+Skrivande av rapport
+
+2023-12-18
+Forstatt sammansktälla det första utkastet av rapporten.
+
+2023-12-19
+Skrev klart och skickade in första utkastet av rappporten till handleraren för att få kommentarer.
+
+2023-12-20
+Vi har skapade en första draft på postern. Provat lite figurer och diskuterat vilka sorters resultat vi ska visa.
+
+2023-12-21
+Fortsatt jobba med postern.
+
+2023-12-22
+Fortsatt jobba med postern.
