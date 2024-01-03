@@ -1,0 +1,6 @@
+Library:
+Numpy - 1.22.3
+Matplotlib - 3.5.2
+Pandas - 1.4.2
+Scipy - 1.8.0
+Polars - 0.19.19
