@@ -1,6 +1,0 @@
-New insight into social relationships in dairy cows, and how time of birth, parity and relatedness affect spatial interactions later in life.
-H. Marina, K. Ren, I. Hansson F. Fikse, P. P. Nielsen, and L. Rönnegård
-
-Artikeln undersöker hur olika mjölkkors karakteristiska drag påverkar sannorlikheten om skapandet eller fortsättningen av ett socialt umgänge mellan två kor. Den utgår från ett dataset som beskriver en kos position en gång per sekund genom ett ultra-wideband system. Från denna positionsdata för lla individuella kor (bortsett från de kossor med icke, fulständigt dataset) identifieras när en social kontakt är gjord mellan de två korna. Denna data är sedan 
-
-I reslutatet verkar det finnas störst social kontakt mellan kossor som är födda inom 7 dagar av varandra, har haft lika många kalvar eller de som är närmast relaterade.
